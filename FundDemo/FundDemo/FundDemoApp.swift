@@ -13,7 +13,7 @@ struct FundDemoApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            FundPurchaseView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
