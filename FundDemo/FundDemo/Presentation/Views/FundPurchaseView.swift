@@ -21,7 +21,6 @@ struct FundPurchaseView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                // 1. 藍色背景 Header
                 VStack(alignment: .leading, spacing: 8) {
                     Spacer()
                         .frame(height: 35)
@@ -34,13 +33,13 @@ struct FundPurchaseView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 30)
                 .padding(.horizontal)
-                .background(Color.blue)
+                .background(Color.titleBlueBG)
                 .foregroundColor(.white)
                 
                 VStack(spacing: 20) {
-                    // 基金選擇選單
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("選擇基金").font(.caption).foregroundColor(.gray)
+                        Text("選擇基金")
+                            .font(.caption)
                         fundDropdownMenu
                     }
                     .padding(.top)
@@ -51,16 +50,18 @@ struct FundPurchaseView: View {
                         
                         // 3. 圖表 (確保數據傳入)
                         NavChartView(data: viewModel.navHistory, selectedDate: $viewModel.selectedDate)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 0.5))
                         
                         // 4. & 5. 申購計算區塊
                         purchaseCalculationSection(fund: fund)
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 0.5))
                     }
                 }
                 .padding()
             }
         }
         .edgesIgnoringSafeArea(.top)
-        .background(Color(white: 0.98))
+        .background(.white)
         .task { await viewModel.loadData() }
     }
     
@@ -86,33 +87,40 @@ struct FundPurchaseView: View {
     
     private func purchaseCalculationSection(fund: Fund) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Label("申購計算", systemImage: "dollarsign.circle")
-                .font(.headline)
+            HStack {
+                Image(systemName: "dollarsign")
+                    .foregroundColor(.darkGreen)
+                Text("申購計算").font(.headline)
+                Spacer()
+            }
             
             HStack(alignment: .top, spacing: 15) {
                 // 申購單位數
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("申購單位數").font(.caption).foregroundColor(.gray)
-                    TextField("輸入單位", text: $viewModel.unitsText)
+                    Text("申購單位數")
+                        .font(.caption)
+                    TextField("請輸入單位數", text: $viewModel.unitsText)
                         .keyboardType(.decimalPad)
                         .padding()
-                        .background(Color.blue.opacity(0.05))
+                        .background(Color.clear)
                         .cornerRadius(8)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 0.5))
                     Text("每單位淨值: NT$ \(fund.latestNav, specifier: "%.2f")")
                         .font(.caption2).foregroundColor(.gray)
                 }
                 
                 // 申購金額顯示
-                VStack(alignment: .trailing, spacing: 8) {
-                    Text("申購金額").font(.caption).foregroundColor(.gray)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("申購金額")
+                        .font(.caption)
                     Text("NT$ \(viewModel.totalAmount, specifier: "%.2f")")
                         .font(.title3).bold()
-                        .foregroundColor(.green)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .foregroundColor(.darkGreen)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                         .background(Color.white)
                         .cornerRadius(8)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.green.opacity(0.2)))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 0.5))
                     
                     // 顯示計算式
                     Text("\(viewModel.unitsText) 單位 × NT$ \(fund.latestNav, specifier: "%.2f")")
@@ -121,15 +129,20 @@ struct FundPurchaseView: View {
             }
             
             // 確認申購按鈕
-            Button(action: {}) {
-                Text("確認申購 NT$ \(viewModel.totalAmount, specifier: "%.2f")")
+            Button(action: {
+                // action
+            }) {
+                Text(viewModel.totalAmount > 0
+                     ? "確認申購 NT$ \(viewModel.totalAmount, specifier: "%.2f")"
+                     : "確認申購")
                     .bold()
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.green)
+                    .background(viewModel.totalAmount > 0 ? Color.darkGreen : Color.darkGreen.opacity(0.5))
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
+            .disabled(viewModel.totalAmount <= 0)
         }
         .padding()
         .background(Color.green.opacity(0.05))

@@ -29,7 +29,12 @@ struct NavChartView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("近三個月淨值走勢", systemImage: "chart.line.uptrend.xyaxis").font(.headline)
+            HStack {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .foregroundStyle(Color.titleBlueBG)
+                Text("近三個月淨值走勢")
+                    .font(.headline)
+            }
             
             GeometryReader { geometry in
                 Chart {
@@ -51,8 +56,48 @@ struct NavChartView: View {
                             .symbolSize(100)
                     }
                 }
+                .chartYAxis {
+                    AxisMarks(position: .leading) { value in
+                        AxisGridLine(stroke: StrokeStyle(lineWidth: 1, dash: [5, 5]))
+                            .foregroundStyle(.gray.opacity(0.3))
+                        AxisValueLabel()
+                    }
+                }
+                .chartXAxis {
+                    let xValues: [Date] = {
+                        guard data.count >= 2 else { return [] }
+                        var dates: [Date] = []
+                        let step = Double(data.count - 1) / 6.0
+                        for i in 0...6 {
+                            let index = Int(round(Double(i) * step))
+                            if index < data.count {
+                                dates.append(data[index].date)
+                            }
+                        }
+                        return dates
+                    }()
+                    
+                    AxisMarks(values: xValues) { value in
+                        AxisGridLine(stroke: StrokeStyle(lineWidth: 1, dash: [5, 5]))
+                            .foregroundStyle(.gray.opacity(0.3))
+                        
+                        AxisValueLabel(
+                            anchor: .top,
+                            collisionResolution: .disabled,
+                            offsetsMarks: true,
+                            content: {
+                                if let date = value.as(Date.self) {
+                                    Text(date.formatted(.dateTime.month(.twoDigits).day(.defaultDigits)))
+                                }
+                            }
+                        )
+                    }
+                }
+                .chartPlotStyle { plotContent in
+                    plotContent
+                        .border(width: 1, edges: [.leading, .bottom], color: .gray.opacity(0.8))
+                }
                 .overlay(alignment: .topLeading) {
-                    // ✅ 修正：確保在 selectedPoint 存在時才渲染 overlay
                     if let sel = selectedPoint {
                         tooltipOverlay(for: sel, in: geometry.size)
                     }
@@ -65,7 +110,6 @@ struct NavChartView: View {
         .padding()
         .background(Color.white)
         .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 5)
     }
     
     @ViewBuilder
@@ -81,7 +125,6 @@ struct NavChartView: View {
             let isTooRight = xRatio > 0.6
             
             VStack(alignment: .leading, spacing: 4) {
-                // 數字日期格式 (12/01)
                 Text(point.date.formatted(.dateTime.month(.twoDigits).day(.twoDigits)))
                     .font(.caption2)
                     .foregroundColor(.gray)
@@ -101,12 +144,9 @@ struct NavChartView: View {
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.blue.opacity(0.1)))
             .fixedSize()
             .offset(
-                x: isTooRight
-                    ? (size.width * xRatio - tooltipWidth - leftGap)
-                    : (size.width * xRatio + rightGap),
+                x: isTooRight ? (size.width * xRatio - tooltipWidth - leftGap) : (size.width * xRatio + rightGap),
                 y: 30
             )
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isTooRight)
         } else {
             EmptyView()
         }
