@@ -20,13 +20,16 @@ class FundRepository: FundRepositoryProtocol {
         let (data, _) = try await URLSession.shared.data(from: url)
         
         let decoder = JSONDecoder()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd"
+        let allDtos = try decoder.decode([NavDTO].self, from: data)
         
-        let dtos = try decoder.decode([NavDTO].self, from: data)
-        return dtos.compactMap { dto in
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d/yyyy"
+        
+        let filteredPoints = allDtos.filter { $0.fundID == fundId }.compactMap { dto -> NavPoint? in
             guard let date = formatter.date(from: dto.navDate) else { return nil }
             return NavPoint(date: date, value: dto.nav)
         }
+        
+        return filteredPoints.sorted(by: { $0.date < $1.date })
     }
 }
