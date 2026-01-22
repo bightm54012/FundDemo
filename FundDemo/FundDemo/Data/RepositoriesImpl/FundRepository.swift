@@ -11,9 +11,6 @@ class FundRepository: FundRepositoryProtocol {
     func fetchFundInfo() async throws -> [Fund] {
         let url = URL(string: "https://f66d0ed1-fcb0-4c05-b5d2-e5b0a8159477.mock.pstmn.io/api/fund/info")!
         let (data, _) = try await URLSession.shared.data(from: url)
-        if let jsonString = String(data: data, encoding: .utf8) {
-            print("API Response JSON: \(jsonString)")
-        }
         let dtos = try JSONDecoder().decode([FundDTO].self, from: data)
         return dtos.map { $0.toDomain() }
     }

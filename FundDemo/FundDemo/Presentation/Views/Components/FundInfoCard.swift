@@ -11,28 +11,46 @@ struct FundInfoCard: View {
     let fund: Fund
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                infoTile(title: "基金代碼", value: fund.id)
-                Spacer()
-                infoTile(title: "最新淨值", value: "\(fund.latestNav)", color: .green)
+        VStack(spacing: 16) {
+            HStack(alignment: .top, spacing: 0) {
+                infoTile(icon: "doc.text", title: "基金代碼", value: fund.id)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                infoTile(icon: "chart.line.uptrend.xyaxis", title: "最新淨值", value: "NT$ \(fund.latestNav)", color: .green)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            Divider()
-            HStack {
-                infoTile(title: "基金類型", value: fund.category)
-                Spacer()
-                infoTile(title: "成立日期", value: fund.inceptionDate)
+            
+            HStack(alignment: .top, spacing: 0) {
+                infoTile(icon: "tag", title: "基金類型", value: fund.category)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                infoTile(icon: "calendar", title: "成立日期", value: fund.inceptionDate)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
+            
+            infoTile(icon: "building.2", title: "管理公司", value: fund.company)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding()
+        .padding(16)
         .background(Color.blue.opacity(0.05))
         .cornerRadius(12)
     }
     
-    private func infoTile(title: String, value: String, color: Color = .primary) -> some View {
-        VStack(alignment: .leading) {
-            Text(title).font(.caption).foregroundColor(.gray)
-            Text(value).font(.body).bold().foregroundColor(color)
+    private func infoTile(icon: String, title: String, value: String, color: Color = .primary) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .foregroundColor(.blue)
+                .frame(width: 20)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.caption2)
+                    .foregroundColor(.gray)
+                Text(value)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(color)
+                    .lineLimit(1)
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ class FundPurchaseViewModel: ObservableObject {
     @Published var funds: [Fund] = []
     @Published var selectedFund: Fund?
     @Published var navHistory: [NavPoint] = []
-    @Published var unitsText: String = "123"
+    @Published var unitsText: String = "1"
     
     @Published var selectedDate: Date?
     var selectedNavPoint: NavPoint? {
