@@ -81,7 +81,7 @@ struct FundPurchaseView: View {
             .padding()
             .background(Color.white)
             .cornerRadius(10)
-            .shadow(color: .black.opacity(0.05), radius: 2)
+            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3), lineWidth: 0.5))
         }
     }
     
@@ -123,7 +123,9 @@ struct FundPurchaseView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.green, lineWidth: 0.5))
                     
                     // 顯示計算式
-                    Text("\(viewModel.unitsText) 單位 × NT$ \(fund.latestNav, specifier: "%.2f")")
+                    Text(viewModel.totalAmount > 0 ?
+                         "\(viewModel.unitsText) 單位 × NT$ \(fund.latestNav, specifier: "%.2f")"
+                         : "請先輸入單位數")
                         .font(.caption2).foregroundColor(.gray)
                 }
             }

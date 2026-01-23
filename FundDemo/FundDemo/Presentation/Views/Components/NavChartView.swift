@@ -119,8 +119,8 @@ struct NavChartView: View {
             let currentTime = point.date.timeIntervalSince(firstDate)
             let xRatio = CGFloat(currentTime / totalTime)
             
-            let leftGap: CGFloat = 25
-            let rightGap: CGFloat = 8
+            let leftGap: CGFloat = 10
+            let rightGap: CGFloat = 25
             let tooltipWidth: CGFloat = 110
             let isTooRight = xRatio > 0.6
             
